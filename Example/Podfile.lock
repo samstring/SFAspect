@@ -1,0 +1,27 @@
+PODS:
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - SFAspect (0.1.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase
+  - SFAspect (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - FBSnapshotTestCase
+
+EXTERNAL SOURCES:
+  SFAspect:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  SFAspect: 56d741db5fbf6b8af6536d12a33063323ad6f2bc
+
+PODFILE CHECKSUM: ea60eb5e49a19a54668771a2e615f8b221c8b092
+
+COCOAPODS: 1.8.4
