@@ -51,7 +51,6 @@
         //也可以通过invocation获取返回值，详情参考消息转发过程中NSInvocation的用法
           
        }];
-    
     [self.navigationController pushViewController:self.vc animated:YES];
 }
 
@@ -109,21 +108,8 @@
         NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
         
     }];
-    NSLog(@"对象的类型为%@",NSStringFromClass([self.vc class]));
     //移除hook后hook里面的block不执行
     [self.vc removeHook:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
-    NSLog(@"对象的类型为%@",NSStringFromClass([self.vc class]));
-    
-    [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
-
-        NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
-
-    }];
-    NSLog(@"对象的类型为%@",NSStringFromClass([self.vc class]));
-    //移除hook后hook里面的block不执行
-//    [self.vc removeHook:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
-//    NSLog(@"对象的类型为%@",NSStringFromClass([self.vc class]));
-    
     [self.navigationController pushViewController:self.vc animated:YES];
 }
 

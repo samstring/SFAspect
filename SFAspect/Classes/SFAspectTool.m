@@ -17,7 +17,7 @@
 #import <objc/message.h>
 #import <pthread/pthread.h>
 
-#define SubClassPrefix @"sf_SubClass_"
+#define SubClassPrefix @"_sf_SubClass_"
 #define OriginalMethodPrefix @"_originalMethodPrefix_"
 typedef BOOL (^LockBlock)(void);
 
@@ -477,6 +477,8 @@ typedef BOOL (^LockBlock)(void);
                         class_replaceMethod(metaClass, forwardSEL,method_getImplementation(class_getInstanceMethod(metaClass, selWithPrefix(OriginalMethodPrefix, forwardSEL))), [[container.methodSig objectForKey:NSStringFromSelector(forwardSEL)] UTF8String]);
                     }
                 }
+                //删除SFAspectContainer容器内容
+                objc_setAssociatedObject([self class], "hook_action_container", nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                 
             }
             
@@ -729,7 +731,14 @@ Class generateSubClass(NSObject * object,NSString *identify){
 ///调用的hookSel，会清除内存中无用的子类
 /// @param object <#object description#>
 void clearNoUseSubClass(id object){
-    NSMutableArray<SubClassModel *> *array =  objc_getAssociatedObject([object class], "subClassArray");
+    NSMutableArray<SubClassModel *> *array = nil;
+    if([NSStringFromClass([object class]) hasPrefix:SubClassPrefix]){
+        objc_getAssociatedObject([object superclass], "subClassArray");
+    }
+    else{
+        objc_getAssociatedObject([object class], "subClassArray");
+    }
+    
     if (array == nil) {
         objc_setAssociatedObject([object class], "subClassArray", [NSMutableArray array], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
