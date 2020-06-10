@@ -43,22 +43,22 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GE2-et-EDF">
-                                <rect key="frame" x="101.5" y="114" width="172" height="30"/>
-                                <state key="normal" title="hook单个对象的实例方法"/>
+                                <rect key="frame" x="109" y="114" width="157" height="30"/>
+                                <state key="normal" title="hook单个对象的类方法"/>
                                 <connections>
                                     <action selector="hookSigleObjectForClassMethod:" destination="whP-gf-Uak" eventType="touchUpInside" id="DFK-uD-oUP"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pPT-R6-Jnp">
-                                <rect key="frame" x="101.5" y="164" width="172" height="30"/>
-                                <state key="normal" title="hook所有对象的实例方法"/>
+                                <rect key="frame" x="94" y="164" width="187" height="30"/>
+                                <state key="normal" title="hook类所有对象的实例方法"/>
                                 <connections>
                                     <action selector="hookAllObjectInstanceMethod:" destination="whP-gf-Uak" eventType="touchUpInside" id="di4-mf-SPw"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CyK-j3-h9h">
-                                <rect key="frame" x="109" y="214" width="157" height="30"/>
-                                <state key="normal" title="hook所有对象的类方法"/>
+                                <rect key="frame" x="101.5" y="214" width="172" height="30"/>
+                                <state key="normal" title="hook类所有对象的类方法"/>
                                 <connections>
                                     <action selector="hookAllObjectClassMethod:" destination="whP-gf-Uak" eventType="touchUpInside" id="kB5-3J-fPn"/>
                                 </connections>

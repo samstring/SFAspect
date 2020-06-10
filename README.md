@@ -5,21 +5,103 @@
 [![License](https://img.shields.io/cocoapods/l/SFAspect.svg?style=flat)](https://cocoapods.org/pods/SFAspect)
 [![Platform](https://img.shields.io/cocoapods/p/SFAspect.svg?style=flat)](https://cocoapods.org/pods/SFAspect)
 
-## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
-
-## Installation
-
-SFAspect is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod 'SFAspect'
+####使用
+- hook单个对象实例方法
+```
+ [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        BOOL animated = NO;
+        NSInvocation *invocation =  aspectModel.originalInvocation;
+        //参数从2开始，因为方法执行的时候隐式携带了两个参数：self 和 _cmd，self是方法调用者，_cmd是被调用f方法的sel
+        [invocation getArgument:&animated atIndex:2];
+        NSLog(@"准备执行viewWillAppear,参数animated的值为%d",animated);
+        //改变参数
+        animated  = NO;
+        [invocation setArgument:&animated atIndex:2];
+    }];
+    [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"2" withPriority:0 withHookOption:(HookOptionAfter) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+           BOOL animated = NO;
+           NSInvocation *invocation =  aspectModel.originalInvocation;
+           //参数从2开始，因为方法执行的时候隐式携带了两个参数：self 和 _cmd，self是方法调用者，_cmd是被调用f方法的sel
+           [invocation getArgument:&animated atIndex:2];
+           NSLog(@"执行viewWillAppear后,参数animated的值为%d",animated);
+        //也可以通过invocation获取返回值，详情参考消息转发过程中NSInvocation的用法
+          
+       }];
 ```
 
+- hook单个对象的类方法
+```
+ [self.vc hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"3" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        NSLog(@"hook单个对象的类方法");
+    }];
+```
+
+- hook类的所有对象的实例方法
+```
+ [SFHookViewController hookAllClassSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+       BOOL animated = NO;
+       NSInvocation *invocation =  aspectModel.originalInvocation;
+         [invocation getArgument:&animated atIndex:2];
+        NSLog(@"准备执行viewWillAppear,参数animated的值为%d",animated);
+        
+    }];
+```
+- hook类所有对象的类方法
+```
+ [SFHookViewController hookAllClassSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+       BOOL animated = NO;
+       NSInvocation *invocation =  aspectModel.originalInvocation;
+         [invocation getArgument:&animated atIndex:2];
+       NSLog(@"hook所有对象的类方法");
+        
+    }];
+```
+- hook同一个方法，优先级不同
+```
+[self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+
+          NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+          
+      }];
+    [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"2" withPriority:1 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+                
+        
+    }];
+```
+- 移除hook
+```
+[self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+
+        NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+        
+    }];
+    //移除hook后hook里面的block不执行
+    [self.vc removeHook:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
+```
+- hook中 pre,after，around的区别
+```
+[self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        //pre是在方法前执行
+           NSLog(@"pre-准备执行viewWillAppear");
+           
+       }];
+    [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"2" withPriority:0 withHookOption:(HookOptionAfter) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        //after是在方法前执行
+        NSLog(@"after-执行viewWillAppear后");
+        
+    }];
+    [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"3" withPriority:0 withHookOption:(HookOptionAround) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+        //around是在方法前后执行
+           if(state == HookStatePre){
+                 NSLog(@"around准备执行viewWillAppear");
+           }
+           if (state == HookStateAfter) {
+                 NSLog(@"around-准备执行viewWillAppear");
+           }
+           
+       }];
+```
 ## Author
 
 samstring, 1264986115@qq.com
