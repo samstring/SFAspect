@@ -224,9 +224,9 @@ typedef BOOL (^LockBlock)(void);
         
         
         if (isClassMethod) {
-            addHookAction(sel, identify, priority, option, block, objc_getMetaClass(object_getClassName([self class])));
+            return addHookAction(sel, identify, priority, option, block, objc_getMetaClass(object_getClassName([self class])));
         }else{
-            addHookAction(sel, identify, priority, option, block, [self class]);
+            return addHookAction(sel, identify, priority, option, block, [self class]);
         }
         
                 return YES;
@@ -322,9 +322,9 @@ typedef BOOL (^LockBlock)(void);
         
         
         if (isClassMethod) {
-            addHookAction(sel, identify, priority, option, block, objc_getMetaClass(class_getName([self class])));
+            return addHookAction(sel, identify, priority, option, block, objc_getMetaClass(class_getName([self class])));
         }else{
-            addHookAction(sel, identify, priority, option, block, [self class]);
+            return addHookAction(sel, identify, priority, option, block, [self class]);
         }
         return YES;
         
@@ -401,6 +401,15 @@ typedef BOOL (^LockBlock)(void);
                         //如果符合上面条件的是类方法，则检测对象方法是否有被hook，没有hook的情况下删除类
                         SFAspectContainer *classcontainer = getHookActionContainer([self class]);
                         if(classcontainer.preArray.count == 0 && classcontainer.afterArray.count == 0 && classcontainer.insteadArray.count == 0 && classcontainer.arroundArray.count == 0){
+                            //清除父类中的关联对象
+                            NSMutableArray<SubClassModel *> *array =  objc_getAssociatedObject([self superclass], "subClassArray");
+                              for (int i = 0; i < array.count; i++) {
+                                  SubClassModel *subClass = array[i];
+                                  if (subClass.subClass == [self class]) {
+                                      [array removeObject:subClass];
+                                      break;
+                                  }
+                              }
                             
                             Class class = [self class];
                             object_setClass(self, [self superclass]);
@@ -411,6 +420,16 @@ typedef BOOL (^LockBlock)(void);
                         SFAspectContainer *metaClasscontainer = getHookActionContainer(objc_getMetaClass(class_getName([self class])));
                         //                    SFAspectContainer *metaClasscontainer = getHookActionContainer([self class]);
                         if(metaClasscontainer.preArray.count == 0 && metaClasscontainer.afterArray.count == 0 && metaClasscontainer.insteadArray.count == 0 && metaClasscontainer.arroundArray.count == 0){
+                            
+                            //清除父类中的关联对象
+                            NSMutableArray<SubClassModel *> *array =  objc_getAssociatedObject([self superclass], "subClassArray");
+                              for (int i = 0; i < array.count; i++) {
+                                  SubClassModel *subClass = array[i];
+                                  if (subClass.subClass == [self class]) {
+                                      [array removeObject:subClass];
+                                      break;
+                                  }
+                              }
                             
                             Class class = [self class];
                             object_setClass(self, [self superclass]);
@@ -758,7 +777,7 @@ void addToOrginalSubClass(id object){
 }
 
 #pragma mark - 添加hook回调
-void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,HookBLock block,Class aClass){
+BOOL addHookAction(SEL sel,NSString *identify,int priority,HookOption option,HookBLock block,Class aClass){
     //把block里面需要执行的内容存起来
     //2 将blockl转换成imp，然后包装成个对象，存到数组里面
     SFAspectModel *model = [SFAspectModel new];
@@ -776,8 +795,8 @@ void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.preArray.count; i++) {
                 if ([container.preArray[i].identify isEqualToString:identify] && container.preArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在");
-                    return;
+                    NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    return NO;
                 }
             }
             [container.preArray addObject:model];
@@ -788,8 +807,8 @@ void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.afterArray.count; i++) {
                 if ([container.afterArray[i].identify isEqualToString:identify] && container.afterArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在");
-                    return;
+                   NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    return NO;
                 }
             }
             [container.afterArray addObject:model];
@@ -800,8 +819,8 @@ void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.arroundArray.count; i++) {
                 if ([container.arroundArray[i].identify isEqualToString:identify] && container.arroundArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在");
-                    return;
+                  NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    return NO;
                 }
             }
             [container.arroundArray addObject:model];
@@ -812,8 +831,8 @@ void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.insteadArray.count; i++) {
                 if ([container.insteadArray[i].identify isEqualToString:identify] && container.insteadArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在");
-                    return;
+                  NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    return NO;
                 }
             }
             [container.insteadArray addObject:model];
@@ -824,6 +843,7 @@ void addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         default:
             break;
     }
+    return YES;
     
 }
 
