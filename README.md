@@ -62,7 +62,7 @@ pod 'SFAspect'
         
     }];
 ```
-- hook同一个方法，优先级不同
+- hook同一个方法，优先级不同,优先级越高，越先执行
 ```
 [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
 
