@@ -5,7 +5,18 @@
 [![License](https://img.shields.io/cocoapods/l/SFAspect.svg?style=flat)](https://cocoapods.org/pods/SFAspect)
 [![Platform](https://img.shields.io/cocoapods/p/SFAspect.svg?style=flat)](https://cocoapods.org/pods/SFAspect)
 
-####使用
+## Example
+
+To run the example project, clone the repo, and run `pod install` from the Example directory first.
+
+## Requirements
+
+## 安装
+
+```ruby
+pod 'SFAspect'
+```
+## 使用
 - hook单个对象实例方法
 ```
  [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
@@ -102,6 +113,7 @@
            
        }];
 ```
+
 ## Author
 
 samstring, 1264986115@qq.com
