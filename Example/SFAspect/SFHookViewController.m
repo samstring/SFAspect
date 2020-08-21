@@ -7,7 +7,7 @@
 //
 
 #import "SFHookViewController.h"
-
+#import <SFAspectTool.h>
 @interface SFHookViewController ()
 
 @end
@@ -17,6 +17,28 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    
+    
+//    __weak typeof(self) weakSelf = self;
+//    [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionAround) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+//
+//           if (state == HookStateAfter) {
+////           [aspectModel stopwi
+//               [aspectModel stopWithBlock:^{
+//                   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"停止操作" message:@"" preferredStyle:(UIAlertControllerStyleAlert)];
+//                   [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:nil]];
+//                   [weakSelf presentViewController:alert animated:YES completion:nil];
+//
+//                   NSLog(@"--------停止后续操作");
+//               }];
+//           }
+//
+//              NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+//
+//          }];
+    
+
     
     // Do any additional setup after loading the view from its nib.
 }

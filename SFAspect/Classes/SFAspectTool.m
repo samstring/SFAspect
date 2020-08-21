@@ -528,102 +528,115 @@ NSMethodSignature * getMmethodSignatureForSelector(id object,SEL aSelector){
 
 
 void set_ForwardInvocation(id object,NSInvocation *anInvocation){
-    SEL sel = anInvocation.selector;
-    id assocationObject;
-    if (!object_isClass(object)) {
-        assocationObject = [object class];
-    }else{
-        assocationObject = objc_getMetaClass(class_getName(object));
-    }
-    
-    SFAspectContainer *container = getHookActionContainer(assocationObject);
-    NSString *methodTypeCode = [container.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
-    
-    if (!methodTypeCode) {
-        methodTypeCode = [container.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
-        if (!methodTypeCode) {
-            SFAspectContainer *superClassContainer = getHookActionContainer([assocationObject superclass]);
-            methodTypeCode = [superClassContainer.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
+
+    @try {
+            SEL sel = anInvocation.selector;
+            id assocationObject;
+            if (!object_isClass(object)) {
+                assocationObject = [object class];
+            }else{
+                assocationObject = objc_getMetaClass(class_getName(object));
+            }
+            
+            SFAspectContainer *container = getHookActionContainer(assocationObject);
+            NSString *methodTypeCode = [container.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
+            
             if (!methodTypeCode) {
-                [object performSelector:selWithPrefix(OriginalMethodPrefix, @selector(forwardInvocation:)) withObject:anInvocation];
-                return;
+                methodTypeCode = [container.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
+                if (!methodTypeCode) {
+                    SFAspectContainer *superClassContainer = getHookActionContainer([assocationObject superclass]);
+                    methodTypeCode = [superClassContainer.methodSig objectForKey:NSStringFromSelector(anInvocation.selector)];
+                    if (!methodTypeCode) {
+                        [object performSelector:selWithPrefix(OriginalMethodPrefix, @selector(forwardInvocation:)) withObject:anInvocation];
+                        return;
+                    }
+                    
+                }
+                
             }
             
-        }
-        
-    }
-    
-    //获取block,并传入参数和状态
-#pragma 获取pre
-    NSMutableArray<SFAspectModel *> *preHookArray = [NSMutableArray array];
-    [preHookArray addObjectsFromArray:getHookActionContainer(assocationObject).preArray];
-    [preHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).preArray];
-    [preHookArray addObjectsFromArray:getHookActionContainer(assocationObject).arroundArray];
-    [preHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).arroundArray];
-    
-    sortActionArray(preHookArray);
-    
-    for (int i = 0 ; i < preHookArray.count; i++) {
-        __weak SFAspectModel *model = preHookArray[i];
-        if (model.sel == sel) {
-            HookBLock block =  imp_getBlock(preHookArray[i].imp);
+            //获取block,并传入参数和状态
+        #pragma 获取pre
+            NSMutableArray<SFAspectModel *> *preHookArray = [NSMutableArray array];
+            [preHookArray addObjectsFromArray:getHookActionContainer(assocationObject).preArray];
+            [preHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).preArray];
+            [preHookArray addObjectsFromArray:getHookActionContainer(assocationObject).arroundArray];
+            [preHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).arroundArray];
             
-            model.target =object;
-            model.originalInvocation = anInvocation;
-            if (block) {
-                block(model,HookStatePre);
-            }
-        }
-        
-    }
-    
-    //    SFAspectModel *insteadModel = [self insteadHookModel:anInvocation.selector];
-#pragma 获取instead
-    NSMutableArray<SFAspectModel *> *insteadHookArray = [NSMutableArray array];
-    [insteadHookArray addObjectsFromArray:getHookActionContainer(assocationObject).insteadArray];
-    [insteadHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).insteadArray];
-    sortActionArray(insteadHookArray);
-    
-    if (insteadHookArray.count > 0) {
-        __weak SFAspectModel *insteadModel = insteadHookArray[0];
-        if (insteadModel.sel == sel) {
-            insteadModel.target =object;
-            HookBLock block =  imp_getBlock(insteadModel.imp);
-            insteadModel.originalInvocation = anInvocation;
-            if (block) {
-                block(insteadModel,HookStateInstead);
-            }
-        }
-        
-    }else{
-        
-        anInvocation.target = object;
-        SEL orginalSel = selWithPrefix(OriginalMethodPrefix, anInvocation.selector);
-        anInvocation.selector = orginalSel;
-        [anInvocation invoke];
-    }
-    
-    //获取block,并传入参数和状态
-    NSMutableArray<SFAspectModel *> *afterHookArray = [NSMutableArray array];
-    [afterHookArray addObjectsFromArray:getHookActionContainer(assocationObject).arroundArray];
-       [afterHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).arroundArray];
-    [afterHookArray addObjectsFromArray:getHookActionContainer(assocationObject).afterArray];
-    [afterHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).afterArray];
-   
-    sortActionArray(afterHookArray);
-    
-    for (int i = 0 ; i < afterHookArray.count; i++) {
-        __weak SFAspectModel *model = afterHookArray[i];
-        if (model.sel == sel) {
-            HookBLock block =  imp_getBlock(afterHookArray[i].imp);
+            sortActionArray(preHookArray);
             
-            model.target =object;
-            model.originalInvocation = anInvocation;
-            if (block) {
-                block(model,HookStateAfter);
+            for (int i = 0 ; i < preHookArray.count; i++) {
+                __weak SFAspectModel *model = preHookArray[i];
+                if (model.sel == sel) {
+                    HookBLock block =  imp_getBlock(preHookArray[i].imp);
+                    
+                    model.target =object;
+                    model.originalInvocation = anInvocation;
+                    if (block) {
+                        block(model,HookStatePre);
+                    }
+                }
+                
             }
-        }
-        
+            
+            //    SFAspectModel *insteadModel = [self insteadHookModel:anInvocation.selector];
+        #pragma 获取instead
+            NSMutableArray<SFAspectModel *> *insteadHookArray = [NSMutableArray array];
+            [insteadHookArray addObjectsFromArray:getHookActionContainer(assocationObject).insteadArray];
+            [insteadHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).insteadArray];
+            sortActionArray(insteadHookArray);
+            
+            if (insteadHookArray.count > 0) {
+                __weak SFAspectModel *insteadModel = insteadHookArray[0];
+                if (insteadModel.sel == sel) {
+                    insteadModel.target =object;
+                    HookBLock block =  imp_getBlock(insteadModel.imp);
+                    insteadModel.originalInvocation = anInvocation;
+                    if (block) {
+                        block(insteadModel,HookStateInstead);
+                    }
+                }
+                
+            }else{
+                
+                anInvocation.target = object;
+                SEL orginalSel = selWithPrefix(OriginalMethodPrefix, anInvocation.selector);
+                anInvocation.selector = orginalSel;
+                [anInvocation invoke];
+            }
+            
+            //获取block,并传入参数和状态
+            NSMutableArray<SFAspectModel *> *afterHookArray = [NSMutableArray array];
+            [afterHookArray addObjectsFromArray:getHookActionContainer(assocationObject).arroundArray];
+               [afterHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).arroundArray];
+            [afterHookArray addObjectsFromArray:getHookActionContainer(assocationObject).afterArray];
+            [afterHookArray addObjectsFromArray:getHookActionContainer([assocationObject superclass]).afterArray];
+           
+            sortActionArray(afterHookArray);
+            
+            for (int i = 0 ; i < afterHookArray.count; i++) {
+                __weak SFAspectModel *model = afterHookArray[i];
+                if (model.sel == sel) {
+                    HookBLock block =  imp_getBlock(afterHookArray[i].imp);
+                    
+                    model.target =object;
+                    model.originalInvocation = anInvocation;
+                    if (block) {
+                        block(model,HookStateAfter);
+                    }
+                }
+                
+            }
+    } @catch (NSError *error) {
+//        NSException
+        NSLog(@"========={%@}===========",error);
+        return;
+    }@catch(NSObject *objcet){
+        NSLog(@"========={%@}===========",object);
+               return;
+    }
+    @finally {
+        return;
     }
 }
 
@@ -636,7 +649,6 @@ SEL selWithPrefix(NSString *prefix,SEL sel){
 
 
 #pragma mark - 消息转发
-
 /// 将消息转发替换被hook的方法，这样每次调用被hook的方法的时候都会走消息转发机制
 /// @param object <#object description#>
 /// @param selector <#selector description#>
@@ -655,6 +667,9 @@ static IMP aspect_getMsgForwardIMP(id object, SEL selector) {
         
     }
     const char *encoding = method_getTypeEncoding(method);
+    if (encoding == nil) {
+        return msgForwardIMP;
+    }
     BOOL methodReturnsStructValue = encoding[0] == _C_STRUCT_B;
     if (methodReturnsStructValue) {
         @try {

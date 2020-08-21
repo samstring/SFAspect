@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#define DefaulErrorCode 500
+
+typedef void(^SFStopBlock)(void);
 
 @interface SFAspectModel : NSObject
 
@@ -29,6 +31,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 切点的ID
 @property (nonatomic, strong) NSString *identify;
+
+///停止后续操作
+-(void)stop;
+
+/// 停止后续操作，并自定义error
+/// @param stopBlock  回调
+-(void)stopWithBlock:(SFStopBlock)stopBlock;
+
+/// 停止后续操作，并自定义error
+/// @param error 自定义error
+/// @param stopBlock  回调
+- (void)stopWithError:( NSError *)error withBlock:(SFStopBlock)stopBlock;
+
 @end
 
-NS_ASSUME_NONNULL_END
+
