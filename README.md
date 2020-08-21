@@ -11,6 +11,11 @@
 ```ruby
 pod 'SFAspect'
 ```
+
+## 实现原理
+
+[iOS中AOP面向切面编程SFAspect](https://www.jianshu.com/p/93328288ddc8)
+
 ## 使用
 - hook单个对象实例方法
 ```
@@ -62,7 +67,7 @@ pod 'SFAspect'
         
     }];
 ```
-- hook同一个方法，优先级不同
+- hook同一个方法，优先级不同,优先级越高，越先执行
 ```
 [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
 
