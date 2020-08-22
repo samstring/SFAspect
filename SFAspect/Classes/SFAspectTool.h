@@ -17,9 +17,9 @@ typedef NS_ENUM(NSUInteger, HookOption) {
 };//hook的选项，
 
 typedef NS_ENUM(NSUInteger, HookState) {
-    HookStatePre,
-    HookStateAfter,
-    HookStateInstead,
+    HookStatePre,//方法执行前
+    HookStateAfter,//方法执行后
+    HookStateInstead,//方法替换
 };//方法执行的状态
 
 
