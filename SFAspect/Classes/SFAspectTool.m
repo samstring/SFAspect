@@ -332,6 +332,12 @@ typedef BOOL (^LockBlock)(void);
 }
 
 
+-(void)removeHookInSFAspectBlock:(SEL)sel withIdentify:(NSString *)identify withHookOption:(HookOption)option{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self removeHook:sel withIdentify:identify withHookOption:option];
+    });
+}
+
 /// 删除一个hook action
 /// @param sel <#sel description#>
 /// @param identify <#identify description#>

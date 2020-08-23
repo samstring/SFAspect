@@ -38,6 +38,14 @@
 //
 //          }];
     
+//      __weak typeof(self) weakSelf = self;
+//        [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionAround) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+//            if (state == HookStateAfter) {
+//                [weakSelf removeHookInSFAspectBlock:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withHookOption:HookOptionAround];
+//
+//            }
+//               NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+//           }];
 
     
     // Do any additional setup after loading the view from its nib.

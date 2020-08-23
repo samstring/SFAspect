@@ -52,7 +52,11 @@ typedef void(^HookBLock)(SFAspectModel *aspectModel,HookState state);
 /// @param option hook 的选项
 -(BOOL)removeHook:(SEL)sel withIdentify:(NSString *)identify withHookOption:(HookOption)option;
 
-
+/// 根据 sel,identify,option去移除一个hook action，可以能在 hookSel hookAllClassSel的回调内使用。sel,identify,option可以标志唯一一个hook action
+/// @param sel 被hook的方法
+/// @param identify  hook id。用于标记一个hook action，在sel 和 option相同的情况下，identify必须不同
+/// @param option hook 的选项
+-(void)removeHookInSFAspectBlock:(SEL)sel withIdentify:(NSString *)identify withHookOption:(HookOption)option;
 @end
 
 

@@ -32,14 +32,14 @@ typedef void(^SFStopBlock)(void);
 /// 切点的ID
 @property (nonatomic, strong) NSString *identify;
 
-///停止后续操作
+///停止后续操作,（如在HookOptionPre的block中调用该方法，则该次调用中原方法以及HookOptionInstead，HookOptionAfter中的操作都不执行)
 -(void)stop;
 
-/// 停止后续操作，并自定义error
+/// 停止后续操作,（如在HookOptionPre的block中调用该方法，则该次调用中原方法以及HookOptionInstead，HookOptionAfter中的操作都不执行），并自定义error
 /// @param stopBlock  回调
 -(void)stopWithBlock:(SFStopBlock)stopBlock;
 
-/// 停止后续操作，并自定义error
+/// 停止后续操作,（如在HookOptionPre的block中调用该方法，则该次调用中原方法以及HookOptionInstead，HookOptionAfter中的操作都不执行），并自定义error和回调block
 /// @param error 自定义error
 /// @param stopBlock  回调
 - (void)stopWithError:( NSError *)error withBlock:(SFStopBlock)stopBlock;
