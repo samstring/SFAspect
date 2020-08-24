@@ -93,7 +93,6 @@ pod 'SFAspect'
     [self.vc removeHook:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
 ```
 - 在hook的block中移除hook
-- 移除hook
 ```
 [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
 
