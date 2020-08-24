@@ -45,6 +45,8 @@ pod 'SFAspect'
  [self.vc hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"3" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
         NSLog(@"hook单个对象的类方法");
     }];
+  //调用单个对象的类方法(如果直接用[ClassName sayHiTo:@"" withVCTitle:@""]这种方式不会触发hook)
+  [[self.vc class] sayHiTo:@"" withVCTitle:@""];
 ```
 
 - hook类的所有对象的实例方法
