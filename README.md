@@ -45,6 +45,8 @@ pod 'SFAspect'
  [self.vc hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"3" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
         NSLog(@"hook单个对象的类方法");
     }];
+  //调用单个对象的类方法(如果直接用[ClassName sayHiTo:@"" withVCTitle:@""]这种方式不会触发hook)
+  [[self.vc class] sayHiTo:@"" withVCTitle:@""];
 ```
 
 - hook类的所有对象的实例方法
@@ -89,6 +91,18 @@ pod 'SFAspect'
     }];
     //移除hook后hook里面的block不执行
     [self.vc removeHook:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
+```
+- 在hook的block中移除hook
+```
+[self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+
+        NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+        
+         //移除hook后下一次执行方法的时候该hook里面的内容不执行
+    [self.vc removeHookInSFAspectBlock:@selector(viewWillAppear:) withIdentify:@"1" withHookOption:(HookOptionPre)];
+        
+    }];
+   
 ```
 - hook中 pre,after，around的区别
 ```
