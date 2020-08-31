@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SFAspect'
-  s.version          = '0.1.5'
+  s.version          = '0.1.6'
   s.summary          = 'An aop tool for ios'
 
 # This description is used to generate tags and improve search results.

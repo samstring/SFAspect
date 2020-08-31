@@ -21,8 +21,8 @@
     
     
 //    __weak typeof(self) weakSelf = self;
-//    [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionAround) withBlock:^(SFAspectModel *aspectModel, HookState state) {
-//
+    [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionAfter) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+
 //           if (state == HookStateAfter) {
 ////           [aspectModel stopwi
 //               [aspectModel stopWithBlock:^{
@@ -33,10 +33,31 @@
 //                   NSLog(@"--------停止后续操作");
 //               }];
 //           }
-//
+
 //              NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+        
+        for(int i = 0;i < 10000;i++){
+            NSLog(@"");
+        }
+
+          }];
+    
+        [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"2" withPriority:0 withHookOption:(HookOptionAfter) withBlock:^(SFAspectModel *aspectModel, HookState state) {
+
+//               if (state == HookStateAfter) {
+//    //           [aspectModel stopwi
+//                   [aspectModel stopWithBlock:^{
+//                       UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"停止操作" message:@"" preferredStyle:(UIAlertControllerStyleAlert)];
+//                       [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:(UIAlertActionStyleDefault) handler:nil]];
+//                       [weakSelf presentViewController:alert animated:YES completion:nil];
 //
-//          }];
+//                       NSLog(@"--------停止后续操作");
+//                   }];
+//               }
+//
+//                  NSLog(@"准备执行viewWillAppear,执行的优先级是%d",aspectModel.priority);
+ NSLog(@"2-------");
+              }];
     
 //      __weak typeof(self) weakSelf = self;
 //        [self hookSel:@selector(sayHiTo:withVCTitle:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionAround) withBlock:^(SFAspectModel *aspectModel, HookState state) {
