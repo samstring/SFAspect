@@ -81,6 +81,10 @@
     
 }
 
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    NSLog(@"页面即将出现");
+}
 /*
 #pragma mark - Navigation
 

@@ -32,8 +32,9 @@
 	// Do any additional setup after loading the view, typically from a nib.
 }
 - (IBAction)hookSingleObjectInstanceMethod:(id)sender {
+    __block  BOOL animated = NO;//因为使用invocation getArgument setArgument时候，特别是ID类型，需要用__block
     [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"1" withPriority:0 withHookOption:(HookOptionPre) withBlock:^(SFAspectModel *aspectModel, HookState state) {
-        BOOL animated = NO;
+       
         NSInvocation *invocation =  aspectModel.originalInvocation;
         //参数从2开始，因为方法执行的时候隐式携带了两个参数：self 和 _cmd，self是方法调用者，_cmd是被调用f方法的sel
         [invocation getArgument:&animated atIndex:2];
@@ -41,9 +42,10 @@
         //改变参数
         animated  = NO;
         [invocation setArgument:&animated atIndex:2];
+//        [aspectModel stop];
     }];
     [self.vc hookSel:@selector(viewWillAppear:) withIdentify:@"2" withPriority:0 withHookOption:(HookOptionAfter) withBlock:^(SFAspectModel *aspectModel, HookState state) {
-           BOOL animated = NO;
+//           BOOL animated = NO;
            NSInvocation *invocation =  aspectModel.originalInvocation;
            //参数从2开始，因为方法执行的时候隐式携带了两个参数：self 和 _cmd，self是方法调用者，_cmd是被调用f方法的sel
            [invocation getArgument:&animated atIndex:2];

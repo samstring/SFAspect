@@ -594,7 +594,6 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
         return;
     }
     @finally {
-        return;
     }
     //    SFAspectModel *insteadModel = [self insteadHookModel:anInvocation.selector];
 #pragma 获取instead
@@ -622,7 +621,6 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
                 return;
             }
             @finally {
-                return;
             }
         }
         
@@ -665,7 +663,6 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
         return;
     }
     @finally {
-        return;
     }
     
 }
