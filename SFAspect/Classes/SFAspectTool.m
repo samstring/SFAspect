@@ -97,6 +97,13 @@ typedef BOOL (^LockBlock)(void);
 #pragma mark - 实现
 @implementation NSObject(SFAspectTool)
 
++(void)load{
+    static NSSet *disallowedSelectorList;
+    static dispatch_once_t pred;
+    dispatch_once(&pred, ^{
+        disallowedSelectorList = [NSSet setWithObjects:@"retain", @"release", @"autorelease", @"forwardInvocation:", nil];
+    });
+}
 
 /// 为对象添加一个hook action
 /// @param sel <#sel description#>
