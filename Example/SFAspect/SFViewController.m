@@ -29,6 +29,7 @@
     self.vc.title = @"Hook VC";
     self.vc1 = [[SFHookViewController alloc] initWithNibName:@"SFHookViewController" bundle:nil];
     self.vc1.title = @"Hook VC1";
+    
 	// Do any additional setup after loading the view, typically from a nib.
 }
 - (IBAction)hookSingleObjectInstanceMethod:(id)sender {

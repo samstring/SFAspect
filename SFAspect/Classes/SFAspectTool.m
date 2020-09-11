@@ -6,16 +6,25 @@
 //  Copyright © 2020 samstring. All rights reserved.
 //设计思想，
 //1将hook的函数封装成对象，再关联的对应的类或元类
-//2替换被调用的方法为_objc_msgForward，让被调用的方法走消息转发。对于
+//2替换被调用的方法为_objc_msgForward，让被调用的方法走消息转发。
 //3替换掉默认的methodforsigture 和 forwarinvocation
 //4在自己的forwarinvocation中查找类或是元类的hook对象。调用hook对象的函数的block;
 //5对于上述步骤。如果是调用hookSel方法的话，会去动态生成一个子类，然后在子类替换被hook的方法，替换methodforsigture和forwarinvocation。如果调用的是hookAllClasSel的话，是在原类上操作
-//6删除hook action的时候，在第一步关联的类或元类对象中，找到对应的hook action并删除。如果关联对象中
+//6删除hook action的时候，在第一步关联的类或元类对象中，找到对应的hook action并删除。
 
 #import "SFAspectTool.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread/pthread.h>
+
+
+
+#if DEBUG
+#define SFLog(FORMAT, ...) fprintf(stderr,"%s:%d\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#else
+#define SFLog(FORMAT, ...) nil
+#endif
+
 
 #define SubClassPrefix @"_sf_SubClass_"
 #define OriginalMethodPrefix @"_originalMethodPrefix_"
@@ -97,13 +106,15 @@ typedef BOOL (^LockBlock)(void);
 #pragma mark - 实现
 @implementation NSObject(SFAspectTool)
 
-+(void)load{
-    static NSSet *disallowedSelectorList;
-    static dispatch_once_t pred;
-    dispatch_once(&pred, ^{
-        disallowedSelectorList = [NSSet setWithObjects:@"retain", @"release", @"autorelease", @"forwardInvocation:", nil];
+static NSSet *blackListHookSet;
++ (void)load{
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        blackListHookSet = [NSSet setWithObjects:@"retain", @"release", @"autorelease", @"forwardInvocation:",@"methodSignatureForSelector:", nil];
     });
 }
+
+
 
 /// 为对象添加一个hook action
 /// @param sel <#sel description#>
@@ -112,6 +123,10 @@ typedef BOOL (^LockBlock)(void);
 /// @param option <#option description#>
 /// @param block <#block description#>
 -(BOOL)hookSel:(SEL)sel withIdentify:(NSString *)identify withPriority:(int)priority withHookOption:(HookOption)option withBlock:(HookBLock)block{
+    if([blackListHookSet containsObject:NSStringFromSelector(sel)]){
+        SFLog(@"不支持hook方法%@",NSStringFromSelector(sel));
+        return NO;
+    }
     //动态构建一个字类，将当前的对象的类指向字类
     return  lockHookAction(^{
 #pragma mark 处理类关系
@@ -175,7 +190,7 @@ typedef BOOL (^LockBlock)(void);
         
         //如果方法存在，则hook
         if (method == nil) {
-            NSLog(@"你想hook的方法不存在");
+            SFLog(@"你想hook的方法不存在");
             return NO;
         }
         else{
@@ -249,6 +264,10 @@ typedef BOOL (^LockBlock)(void);
 /// @param option <#option description#>
 /// @param block <#block description#>
 +(BOOL)hookAllClassSel:(SEL)sel withIdentify:(NSString *)identify withPriority:(int)priority withHookOption:(HookOption)option withBlock:(HookBLock)block{
+    if([blackListHookSet containsObject:NSStringFromSelector(sel)]){
+        SFLog(@"不支持hook方法%@",NSStringFromSelector(sel));
+        return NO;
+    }
     return lockHookAction(^{
         BOOL isClassMethod  = NO;
         SEL orginalSel = NSSelectorFromString([NSString stringWithFormat:@"%@%@",OriginalMethodPrefix,NSStringFromSelector(sel)]);
@@ -273,7 +292,7 @@ typedef BOOL (^LockBlock)(void);
             }
         }
         if (method == nil) {
-            NSLog(@"你想hook的方法不存在");
+            SFLog(@"你想hook的方法不存在");
             return NO;
         }
         else{
@@ -357,7 +376,7 @@ typedef BOOL (^LockBlock)(void);
         if (![container.hookMethodArray containsObject:NSStringFromSelector(sel)]) {
             container = getHookActionContainer(objc_getMetaClass(class_getName([self class])));
             if (![container.hookMethodArray containsObject:NSStringFromSelector(sel)]) {
-                NSLog(@"%@没有被hook过",NSStringFromSelector(sel));
+                SFLog(@"%@没有被hook过",NSStringFromSelector(sel));
                 return  NO;
             }
             isClassMethod = YES;
@@ -594,10 +613,10 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
         
     } @catch (NSError *error) {
         //        NSException
-        NSLog(@"========={%@}===========",error);
+        SFLog(@"========={%@}===========",error);
         return;
     }@catch(NSObject *objcet){
-        NSLog(@"========={%@}===========",object);
+        SFLog(@"========={%@}===========",object);
         return;
     }
     @finally {
@@ -621,10 +640,10 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
                 }
             } @catch (NSError *error) {
                 //        NSException
-                NSLog(@"========={%@}===========",error);
+                SFLog(@"========={%@}===========",error);
                 return;
             }@catch(NSObject *objcet){
-                NSLog(@"========={%@}===========",object);
+                SFLog(@"========={%@}===========",object);
                 return;
             }
             @finally {
@@ -663,10 +682,10 @@ void set_ForwardInvocation(id object,NSInvocation *anInvocation){
         }
     } @catch (NSError *error) {
         //        NSException
-        NSLog(@"========={%@}===========",error);
+        SFLog(@"========={%@}===========",error);
         return;
     }@catch(NSObject *objcet){
-        NSLog(@"========={%@}===========",object);
+        SFLog(@"========={%@}===========",object);
         return;
     }
     @finally {
@@ -853,7 +872,7 @@ BOOL addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.preArray.count; i++) {
                 if ([container.preArray[i].identify isEqualToString:identify] && container.preArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    SFLog(@"相同类型和ID的hook已存在，hook不成功");
                     return NO;
                 }
             }
@@ -865,7 +884,7 @@ BOOL addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.afterArray.count; i++) {
                 if ([container.afterArray[i].identify isEqualToString:identify] && container.afterArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    SFLog(@"相同类型和ID的hook已存在，hook不成功");
                     return NO;
                 }
             }
@@ -877,7 +896,7 @@ BOOL addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.arroundArray.count; i++) {
                 if ([container.arroundArray[i].identify isEqualToString:identify] && container.arroundArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    SFLog(@"相同类型和ID的hook已存在，hook不成功");
                     return NO;
                 }
             }
@@ -889,7 +908,7 @@ BOOL addHookAction(SEL sel,NSString *identify,int priority,HookOption option,Hoo
         {
             for (int i = 0; i <container.insteadArray.count; i++) {
                 if ([container.insteadArray[i].identify isEqualToString:identify] && container.insteadArray[i].sel == sel) {
-                    NSLog(@"相同类型和ID的hook已存在，hook不成功");
+                    SFLog(@"相同类型和ID的hook已存在，hook不成功");
                     return NO;
                 }
             }
@@ -911,9 +930,6 @@ void sortActionArray(NSMutableArray<SFAspectModel *> *array){
         if(((SFAspectModel *)obj1).priority >= ((SFAspectModel *)obj2).priority ){
             return NSOrderedAscending;
         }
-        //        else if(((SFAspectModel *)obj1).priority == ((SFAspectModel *)obj2).priority ){
-        //            return NSOrderedSame;
-        //        }
         else{
             return NSOrderedDescending;
         }
@@ -927,7 +943,6 @@ static BOOL lockHookAction(LockBlock block) {
     static pthread_mutex_t mutex =PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&mutex);
     BOOL result = block();
-    
     pthread_mutex_unlock(&mutex);
     return result;
     

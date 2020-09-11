@@ -33,7 +33,6 @@
     
     [userInfo setObject:target forKey:@"target"];
     
-//    [userInfo setObject:[NSString stringWithFormat:@"  %@  ",self.originalInvocation] forKey:@"originalInvocation"];
     [userInfo setObject:[NSString stringWithFormat:@"  %d  ",self.priority] forKey:@"priority"];
     [userInfo setObject:[NSString stringWithFormat:@"  %@  ",NSStringFromSelector(self.sel)] forKey:@"sel"];
 
