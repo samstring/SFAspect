@@ -14,7 +14,7 @@ pod 'SFAspect'
 
 ## 实现原理
 
-[iOS中AOP面向切面编程SFAspect](https://www.jianshu.com/p/93328288ddc8)
+[iOS中的AOP(2)-SFAspect的实现原理](https://juejin.im/post/6871909258150019079)
 
 ## 使用
 - hook单个对象实例方法
@@ -127,7 +127,25 @@ pod 'SFAspect'
            
        }];
 ```
+- 停止后续操作
+```
+ __block CFAbsoluteTime startTime;
+    HookBLock block = ^(SFAspectModel *aspectModel, HookState state) {
+		//控制两秒内不可再次点击button
+        CFAbsoluteTime linkTime = (CFAbsoluteTimeGetCurrent() - startTime);
+        if (linkTime< 2) {
+            [aspectModel stop];//停止操作
+//            [aspectModel stopWithBlock:^{
+//                //停止并抛出异常
+//            }];
+        }else{
+            startTime = CFAbsoluteTimeGetCurrent();
+        }
+     };
+     
+     [UIButton hookSel:@selector(sendAction:to:forEvent:) withIdentify:@"22" withPriority:1 withHookOption:(HookOptionPre) withBlock:block];
 
+```
 ## Author
 
 samstring, 1264986115@qq.com
